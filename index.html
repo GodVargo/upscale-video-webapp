@@ -1,399 +1,97 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Upscale Video</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- WebSR SDK для апскейлинга -->
-    <script src="https://cdn.jsdelivr.net/npm/@aspect-build/websr@0.1.0/dist/websr.min.js"></script>
     <style>
-        :root {
-            --tg-theme-bg-color: #1a1a2e;
-            --tg-theme-text-color: #ffffff;
-            --tg-theme-hint-color: #8b8b8b;
-            --tg-theme-link-color: #6c5ce7;
-            --tg-theme-button-color: #6c5ce7;
-            --tg-theme-button-text-color: #ffffff;
-            --tg-theme-secondary-bg-color: #16213e;
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: var(--tg-theme-bg-color);
-            color: var(--tg-theme-text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
             min-height: 100vh;
-            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-        
+
         .container {
-            max-width: 500px;
-            margin: 0 auto;
-        }
-        
-        h1 {
-            font-size: 24px;
+            max-width: 400px;
             text-align: center;
-            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 24px;
             background: linear-gradient(135deg, #6c5ce7, #a29bfe);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
-        
-        .subtitle {
-            text-align: center;
-            color: var(--tg-theme-hint-color);
-            font-size: 14px;
-            margin-bottom: 24px;
-        }
-        
+
         .upload-zone {
-            border: 2px dashed var(--tg-theme-button-color);
-            border-radius: 16px;
-            padding: 40px 20px;
-            text-align: center;
+            border: 2px dashed #6c5ce7;
+            border-radius: 20px;
+            padding: 50px 30px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            background: var(--tg-theme-secondary-bg-color);
-            margin-bottom: 20px;
-        }
-        
-        .upload-zone:hover {
             background: rgba(108, 92, 231, 0.1);
-            transform: scale(1.02);
+            transition: all 0.3s;
         }
-        
-        .upload-zone.dragover {
+
+        .upload-zone:hover {
             background: rgba(108, 92, 231, 0.2);
+            transform: scale(1.02);
             border-color: #a29bfe;
         }
-        
+
         .upload-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-        
-        .upload-text {
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
-        
-        .upload-hint {
-            font-size: 12px;
-            color: var(--tg-theme-hint-color);
-        }
-        
-        input[type="file"] {
-            display: none;
-        }
-        
-        .video-preview {
-            display: none;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 20px;
-            background: #000;
-        }
-        
-        .video-preview video {
-            width: 100%;
-            max-height: 300px;
-            object-fit: contain;
-        }
-        
-        .video-info {
-            display: none;
-            background: var(--tg-theme-secondary-bg-color);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-        
-        .video-info p {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        
-        .video-info p:last-child {
-            margin-bottom: 0;
-        }
-        
-        .video-info span {
-            color: var(--tg-theme-hint-color);
-        }
-        
-        .options {
-            display: none;
-            background: var(--tg-theme-secondary-bg-color);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-        
-        .options h3 {
-            font-size: 14px;
-            margin-bottom: 12px;
-            color: var(--tg-theme-hint-color);
-        }
-        
-        .scale-options {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .scale-btn {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid transparent;
-            border-radius: 8px;
-            background: rgba(108, 92, 231, 0.1);
-            color: var(--tg-theme-text-color);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .scale-btn:hover {
-            background: rgba(108, 92, 231, 0.2);
-        }
-        
-        .scale-btn.active {
-            border-color: var(--tg-theme-button-color);
-            background: rgba(108, 92, 231, 0.3);
-        }
-        
-        .btn {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            color: #fff;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: none;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4);
-        }
-        
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .progress-container {
-            display: none;
-            margin-bottom: 20px;
-        }
-        
-        .progress-bar {
-            height: 8px;
-            background: var(--tg-theme-secondary-bg-color);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 8px;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #6c5ce7, #a29bfe);
-            border-radius: 4px;
-            width: 0%;
-            transition: width 0.3s;
-        }
-        
-        .progress-text {
-            text-align: center;
-            font-size: 14px;
-            color: var(--tg-theme-hint-color);
-        }
-        
-        .result-container {
-            display: none;
-            text-align: center;
-        }
-        
-        .result-video {
-            border-radius: 12px;
-            overflow: hidden;
+            font-size: 60px;
             margin-bottom: 16px;
-            background: #000;
         }
-        
-        .result-video video {
-            width: 100%;
-            max-height: 300px;
-            object-fit: contain;
+
+        .upload-text {
+            font-size: 18px;
+            font-weight: 500;
         }
-        
-        .download-btn {
-            display: inline-block;
-            padding: 14px 32px;
-            background: linear-gradient(135deg, #00b894, #00cec9);
-            color: #fff;
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 184, 148, 0.4);
-        }
-        
-        .warning {
-            background: rgba(253, 203, 110, 0.1);
-            border: 1px solid rgba(253, 203, 110, 0.3);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        
-        .warning p {
-            font-size: 13px;
-            color: #fdcb6e;
-        }
-        
-        .error {
-            background: rgba(255, 107, 107, 0.1);
-            border: 1px solid rgba(255, 107, 107, 0.3);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        
-        .error p {
-            font-size: 13px;
-            color: #ff6b6b;
-        }
-        
-        .webgpu-warning {
-            background: rgba(255, 107, 107, 0.1);
-            border: 1px solid rgba(255, 107, 107, 0.3);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            display: none;
-        }
-        
-        .webgpu-warning h2 {
-            color: #ff6b6b;
-            margin-bottom: 12px;
-        }
-        
-        .webgpu-warning p {
-            font-size: 14px;
-            line-height: 1.6;
-            color: var(--tg-theme-hint-color);
-        }
-        
-        .new-video-btn {
-            display: none;
+
+        .subtitle {
             margin-top: 16px;
-            padding: 12px 24px;
-            background: var(--tg-theme-secondary-bg-color);
-            color: var(--tg-theme-text-color);
-            border: none;
-            border-radius: 8px;
             font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .new-video-btn:hover {
-            background: rgba(108, 92, 231, 0.2);
+            color: #8b8b8b;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <h1>🎬 Upscale Video</h1>
-        <p class="subtitle">AI-улучшение качества видео</p>
-        
-        <div id="webgpuWarning" class="webgpu-warning">
-            <h2>⚠️ WebGPU не поддерживается</h2>
-            <p>
-                Ваш браузер не поддерживает WebGPU, который необходим для AI-обработки видео.<br><br>
-                Попробуйте открыть на компьютере в Chrome или Edge последней версии.
-            </p>
+        <h1>Upscale Video</h1>
+        <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">📹</div>
+            <div class="upload-text">Нажмите для перехода</div>
         </div>
-        
-        <div id="mainContent">
-            <div id="uploadZone" class="upload-zone">
-                <div class="upload-icon">📹</div>
-                <div class="upload-text">Нажмите или перетащите видео</div>
-                <div class="upload-hint">MP4, WebM, MOV до 500MB</div>
-            </div>
-            <p class="subtitle" style="margin-top: -10px; margin-bottom: 20px;">Лучше использовать с PC</p>
-            <input type="file" id="fileInput" accept="video/*">
-            
-            <div id="videoPreview" class="video-preview">
-                <video id="previewVideo" controls></video>
-            </div>
-            
-            <div id="videoInfo" class="video-info">
-                <p><span>Файл:</span> <span id="fileName">-</span></p>
-                <p><span>Размер:</span> <span id="fileSize">-</span></p>
-                <p><span>Разрешение:</span> <span id="resolution">-</span></p>
-                <p><span>Длительность:</span> <span id="duration">-</span></p>
-            </div>
-            
-            <div id="options" class="options">
-                <h3>Масштаб увеличения:</h3>
-                <div class="scale-options">
-                    <button class="scale-btn" data-scale="2">2x</button>
-                    <button class="scale-btn active" data-scale="4">4x</button>
-                </div>
-            </div>
-            
-            <div id="warning" class="warning">
-                <p>⚠️ Длинное видео! Обработка может занять много времени. Не закрывайте вкладку.</p>
-            </div>
-            
-            <div id="error" class="error">
-                <p id="errorText"></p>
-            </div>
-            
-            <div id="progressContainer" class="progress-container">
-                <div class="progress-bar">
-                    <div id="progressFill" class="progress-fill"></div>
-                </div>
-                <p id="progressText" class="progress-text">Подготовка...</p>
-            </div>
-            
-            <button id="upscaleBtn" class="btn">🚀 Улучшить видео</button>
-            
-            <div id="resultContainer" class="result-container">
-                <div class="result-video">
-                    <video id="resultVideo" controls></video>
-                </div>
-                <a id="downloadBtn" class="download-btn" href="#" download="upscaled_video.mp4">
-                    ⬇️ Скачать видео
-                </a>
-                <button id="newVideoBtn" class="new-video-btn">🔄 Обработать другое видео</button>
-            </div>
-        </div>
+        <p class="subtitle">Лучше использовать с PC</p>
     </div>
+    <script>
+        const tg = window.Telegram?.WebApp;
+        if (tg) { tg.ready(); tg.expand(); }
 
-    <script src="app.js"></script>
+        document.getElementById('uploadZone').addEventListener('click', function () {
+            const url = 'https://free.upscaler.video/';
+            if (tg) {
+                tg.openLink(url);
+            } else {
+                window.open(url, '_blank');
+            }
+        });
+    </script>
 </body>
+
 </html>
