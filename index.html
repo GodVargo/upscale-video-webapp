@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Upscale Video</title>
+    <title>Upscaler Video</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -61,34 +61,25 @@
             font-size: 18px;
             font-weight: 500;
         }
-
-        .subtitle {
-            margin-top: 16px;
-            font-size: 14px;
-            color: #8b8b8b;
-        }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>Upscale Video</h1>
+        <h1>Upscaler Video</h1>
         <div class="upload-zone" id="uploadZone">
             <div class="upload-icon">📹</div>
-            <div class="upload-text">Нажмите для перехода</div>
+            <div class="upload-text">Нажмите для загрузки видео</div>
         </div>
-        <p class="subtitle">Лучше использовать с PC</p>
     </div>
     <script>
         const tg = window.Telegram?.WebApp;
         if (tg) { tg.ready(); tg.expand(); }
-
         document.getElementById('uploadZone').addEventListener('click', function () {
-            const url = 'https://free.upscaler.video/';
             if (tg) {
-                tg.openLink(url);
+                tg.openLink('https://free.upscaler.video/');
             } else {
-                window.open(url, '_blank');
+                window.open('https://free.upscaler.video/', '_blank');
             }
         });
     </script>
